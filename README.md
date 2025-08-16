@@ -57,4 +57,22 @@ end_date = "2023-01-01"
 - Simulates GBM paths using:
   $S_{t+1} = S_t \cdot exp((\mu-0.5\sigma^2)+\sigma Z)$
 
-Where $Z\sim \mathbb{N}(0,1)$ 
+Where $Z\sim \mathbb{N}(0,1)$.
+
+## Portfolio Analysis Class
+
+- Create a ``Stock_Profile`` for each ticker
+- Simulates a independent Monte Carlo returns for all stocks
+- Computes final returns for each simulated paths $r_i = \frac{S_f}{S_0} - 1$, where $r_i$ is the simulate return calculated from inital price point divide by final price point.
+- Optimizes portfolio weights by maximizing Sharpe ratio:
+  $\text{Sharpe} = \frac{\text{mean(portfolio returns)} - \text{risk free rate}}{\text{std(portfolio returns)}}$
+
+- Penalizes large weights to encourge diversification of investment
+
+
+# Current Limitations
+
+- Assumes stock returns follow Geometric Brownian Motion (GBM), which does not capture extreme markets
+- Does not account for transaction cost or other related fees
+- Optimizes inital weights but does not perform dynamic rebalancing
+- Treats calculating inital weights by simulating paths as if the stocks do not correlate 
