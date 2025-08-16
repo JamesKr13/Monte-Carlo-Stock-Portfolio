@@ -26,7 +26,8 @@ This project provides a Python-based Monte Carlo simulation framework to analyze
   - `scipy`
  
 ```bash
-pip install yfinance pandas numpy matplotlib scipy```
+pip install yfinance pandas numpy matplotlib scipy
+```
 
 
 ## Usage
@@ -36,4 +37,24 @@ pip install yfinance pandas numpy matplotlib scipy```
 ```python
 tickers = ["AAPL", "MSFT", "GOOGL", "SPY"]
 start_date = "2015-01-01"
-end_date = "2023-01-01"```
+end_date = "2023-01-01"
+```
+
+2. Initialize the portfolio analysis:
+   ```python
+   portfolio = Portfolio_Analysis(tickers, start_date, end_date)
+   ```
+3. Generate Monte Carlo simulations and optimize initial weights:
+   ```python
+   portfolio.create_inital_independent_weights()
+   ```
+
+## How it works
+
+# Stock_Profile Class
+- Downloads historical stock prices.
+- Calculates daily log returns, mean (mu), and standard deviation (sigma).
+- Simulates GBM paths using:
+  $S_{t+1} = S_t \cdot exp((\mu-0.5\sigma^2)+\sigma Z)$
+
+Where $Z\sim \mathbb{N}(0,1)$ 
