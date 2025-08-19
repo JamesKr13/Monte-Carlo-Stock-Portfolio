@@ -12,10 +12,23 @@ This project provides a Python-based Monte Carlo simulation framework to analyze
 - Compute final portfolio returns from simulated paths.
 - Optimize initial portfolio weights to maximize Sharpe ratio while penalizing concentration.
 - Supports multiple stocks and custom date ranges.
-- Uses Cholesky decomposition trick to give correlated shock. \[\]
-- Graphs the annualized return from the portfolio paths.
+- Uses Cholesky decomposition trick to give correlated shock.
 
----
+
+$$
+\begin{gather*}
+\Sigma = L\cdot L^T\\
+\text{If $X\sim \mathcal{N}(0,\Sigma)$}\\
+Z = XL^T \sim \mathcal{N}(0,\Sigma)
+\end{gather*}
+$$
+- Computes GBM using the euler apprximation
+
+
+$$
+S_{t+1} = S_t \cdot e^{(\mu - \frac{1}{2}\sigma^2)\Delta t+\sigma Z_t}
+$$
+- Graphs the annualized return from the portfolio paths.
 
 ## Requirements
 
@@ -60,7 +73,7 @@ end_date = "2023-01-01"
 - Simulates GBM paths using:
   $S_{t+1} = S_t \cdot exp((\mu-0.5\sigma^2)+\sigma Z)$
 
-Where $Z\sim \mathbb{N}(0,1)$.
+Where $Z\sim \mathcal{N}(0,1)$.
 
 ## Portfolio Analysis Class
 
