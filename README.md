@@ -12,7 +12,7 @@ This project provides a Python-based Monte Carlo simulation framework to analyze
 - Compute final portfolio returns from simulated paths.
 - Optimize initial portfolio weights to maximize Sharpe ratio while penalizing concentration.
 - Supports multiple stocks and custom date ranges.
-- Uses Cholesky decomposition trick to give correlated shock.
+- Uses Cholesky decomposition trick to give correlated shock. \[\]
 - Graphs the annualized return from the portfolio paths.
 
 ---
