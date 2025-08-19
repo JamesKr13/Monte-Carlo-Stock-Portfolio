@@ -6,21 +6,65 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
-T = 2
+T = 10
 STEPS = 252
-DELTA_T = T/STEPS
+DELTA_T = T*STEPS
 RF = 0.04
+NUM_SIM = 100000
 
 class Portfolio_Analysis:
     def __init__(self, tickers, start_date, end_date):
         self.start_date = start_date
         self.end_date = end_date
         self.tickers = tickers
+        self.weights = [1/len(tickers)]*len(tickers)
 
         # Collect Data
         self.stock_profiles = [Stock_Profile(ticker, start_date, end_date) for ticker in tickers]
 
+        
 
+    def correlated_simulation(self):
+        data = yf.download(
+            tickers,
+            start=start_date,
+            end=end_date,
+            auto_adjust=True
+        )["Close"]
+        print(data)
+        log_returns = np.log(data/data.shift(1)).dropna()
+
+        mean = log_returns.mean().values
+        cov = log_returns.cov().values
+        sigma = np.sqrt(np.diag(cov))
+
+        n_assets = len(self.tickers)
+        S_paths = np.zeros((NUM_SIM, n_assets, DELTA_T))
+        S_paths[:, :, 0] = data.iloc[-1].values
+        #Cholesky decomposition of covariant matrix
+        L = np.linalg.cholesky(cov)
+        drift = (mean- 0.5 * sigma**2)[np.newaxis, :]
+        for t in range(1, DELTA_T):
+            Z = np.random.normal(size=(NUM_SIM, n_assets))
+            correlated_Z = Z @ L.T/ np.sqrt(np.diag(cov))    
+            diffusion = sigma *  correlated_Z
+            S_paths[:, :, t] = S_paths[:, :, t-1] * np.exp(drift + diffusion)
+
+        print("S_paths shape:", S_paths.shape)
+        #S_paths = np.transpose(S_paths, (2,0,1))
+        print(sum(self.weights))
+        portfolio_paths = np.einsum("sat,a->st", S_paths, self.weights)
+        # portfolio_paths = np.sum(portfolio_paths, axis=1)
+        final_val = portfolio_paths[0, :]
+        initial_val = portfolio_paths[-1, :]
+        annualized_returns = (final_val / initial_val) ** (1 / T) - 1 
+        plt.hist(annualized_returns, bins=50, density=True)
+        plt.title("Final Simulated output value")
+        plt.xlabel("Value")
+        plt.ylabel("Denesity")
+
+        plt.show()
+    
     def calculate_independent_MC_returns(self,n_simulations):
         paths = []
 
@@ -73,6 +117,7 @@ class Portfolio_Analysis:
             print(np.mean(path))
         print(type(paths))
         weights_opt = self.optimize_inital_weights(paths.T)
+        self.weights = weights_opt
         
 
         
@@ -82,7 +127,7 @@ class Stock_Profile:
         self.steps = steps
 
         # Download adjusted close prices
-        data = yf.download(
+        self.data = yf.download(
             ticker,
             start=start_date,
             end=end_date,
@@ -90,14 +135,14 @@ class Stock_Profile:
         )
 
         # Check if data exists
-        if data.empty:
+        if self.data.empty:
             raise ValueError(f"No data found for {ticker} between {start_date} and {end_date}")
 
         # Extract 'Close' column as a Series of floats
-        if 'Close' in data.columns:
-            self.prices = data['Close'].astype(float).squeeze()
+        if 'Close' in self.data.columns:
+            self.prices = self.data['Close'].astype(float).squeeze()
         else:
-            self.prices = data.iloc[:, 0].astype(float).squeeze()
+            self.prices = self.data.iloc[:, 0].astype(float).squeeze()
 
         # Initialize stock price array
         self.stock_price = np.zeros(steps + 1, dtype=float)
@@ -126,3 +171,4 @@ end_date = "2023-01-01"
 
 portfolio = Portfolio_Analysis(tickers, start_date, end_date)
 portfolio.create_inital_independent_weights()
+portfolio.correlated_simulation()
