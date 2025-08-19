@@ -12,6 +12,8 @@ This project provides a Python-based Monte Carlo simulation framework to analyze
 - Compute final portfolio returns from simulated paths.
 - Optimize initial portfolio weights to maximize Sharpe ratio while penalizing concentration.
 - Supports multiple stocks and custom date ranges.
+- Uses Cholesky decomposition trick to give correlated shock.
+- Graphs the annualized return from the portfolio paths.
 
 ---
 
@@ -28,7 +30,7 @@ This project provides a Python-based Monte Carlo simulation framework to analyze
 ```bash
 pip install yfinance pandas numpy matplotlib scipy
 ```
-
+---
 
 ## Usage
 
@@ -48,6 +50,7 @@ end_date = "2023-01-01"
    ```python
    portfolio.create_inital_independent_weights()
    ```
+---
 
 ## How it works
 
@@ -68,7 +71,7 @@ Where $Z\sim \mathbb{N}(0,1)$.
   $\text{Sharpe} = \frac{\text{mean(portfolio returns)} - \text{risk free rate}}{\text{std(portfolio returns)}}$
 
 - Penalizes large weights to encourge diversification of investment
-
+---
 
 # Current Limitations
 
